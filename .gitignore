@@ -1,0 +1,9 @@
+# Local
+node_modules/
+
+# Editor
+.vscode
+
+# Biome
+/package.json
+/package-lock.json
