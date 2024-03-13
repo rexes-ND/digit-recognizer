@@ -14,12 +14,17 @@ function App() {
 
 	const handleExport = async () => {
 		if (!stageRef.current) return;
-		const blob = await stageRef.current.toBlob();
+		const blob = (await stageRef.current.toBlob()) as Blob;
 
-		// TODO: Core logic involving the backend
-		// Use fetch
-		console.log(stageRef.current.toDataURL());
-		console.log(blob);
+		const formData = new FormData();
+		formData.append("img", blob, "image.png");
+		const res = await fetch("http://localhost:8000/api/recognize/", {
+			method: "POST",
+			body: formData,
+		});
+		const data = await res.json();
+		// TODO: some notification
+		console.log(data);
 
 		// Reset
 		setLines([]);
