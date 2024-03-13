@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Stage, Layer, Line } from "react-konva";
+import { Stage, Layer, Line, Rect } from "react-konva";
 import type Konva from "konva";
 import type { KonvaEventObject } from "konva/lib/Node";
 
@@ -14,11 +14,12 @@ function App() {
 
 	const handleExport = async () => {
 		if (!stageRef.current) return;
-		console.log(stageRef.current);
 		const blob = await stageRef.current.toBlob();
 
 		// TODO: Core logic involving the backend
 		// Use fetch
+		console.log(stageRef.current.toDataURL());
+		console.log(blob);
 
 		// Reset
 		setLines([]);
@@ -77,13 +78,16 @@ function App() {
 					onMouseMove={handleMouseMove}
 					onMouseUp={handleMouseUp}
 					ref={stageRef}
+					background="white"
 				>
 					<Layer>
+						<Rect width={300} height={300} fill="white" />
 						{lines.map((line, i) => (
 							<Line
 								key={i}
 								points={line.points}
-								stroke="#df4b26"
+								// stroke="#df4b26"
+								stroke="black"
 								strokeWidth={5}
 								tension={0.5}
 								lineCap="round"
