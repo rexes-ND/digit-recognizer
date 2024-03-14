@@ -129,8 +129,6 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-if os.environ.get("KAGGLE_USERNAME") is None or os.environ.get("KAGGLE_KEY") is None:
-    raise KeyError("Please set Kaggle credentials.")
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",

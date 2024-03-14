@@ -15,6 +15,12 @@ class Command(BaseCommand):
             competition = "digit-recognizer"
             data_path = f"{settings.BASE_DIR}/data"
 
+            if (
+                os.environ.get("KAGGLE_USERNAME") is None
+                or os.environ.get("KAGGLE_KEY") is None
+            ):
+                raise KeyError("Please set Kaggle credentials.")
+
             api = KaggleApi()
             api.authenticate()
             api.competition_download_files(
