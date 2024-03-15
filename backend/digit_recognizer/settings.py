@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -41,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # third-party
     "corsheaders",
+    "django_extensions",
     # local
     "api",
 ]
@@ -133,3 +133,22 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
+
+
+NOTEBOOK_ARGUMENTS = [
+    "--ip",
+    "0.0.0.0",
+    "--allow-root",
+    "--no-browser",
+    "--NotebookApp.token=''",
+    "--NotebookApp.password=''",
+    "--NotebookApp.disable_check_xsrf=True",
+]
+
+""" First, run following lines inside Jupyter Notebook
+import os
+import django
+
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+django.setup()
+"""
