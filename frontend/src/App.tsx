@@ -9,25 +9,27 @@ type CustomLine = {
 
 function App() {
 	const [lines, setLines] = useState<Array<CustomLine>>([]);
+	const [digit, setDigit] = useState<number | null>(null);
 	const isDrawing = useRef(false);
 	const stageRef = useRef<Konva.Stage>(null);
 
 	const handleExport = async () => {
 		if (!stageRef.current) return;
-		const blob = (await stageRef.current.toBlob()) as Blob;
+		try {
+			const blob = (await stageRef.current.toBlob()) as Blob;
 
-		const formData = new FormData();
-		formData.append("img", blob, "image.png");
-		const res = await fetch("http://localhost:8000/api/recognize/", {
-			method: "POST",
-			body: formData,
-		});
-		const data = await res.json();
-		// TODO: some notification
-		console.log(data);
-
-		// Reset
-		setLines([]);
+			const formData = new FormData();
+			formData.append("img", blob, "image.png");
+			const res = await fetch("http://localhost:8000/api/recognize/", {
+				method: "POST",
+				body: formData,
+			});
+			const data = await res.json();
+			setDigit(data.digit);
+			setLines([]);
+		} catch (error) {
+			console.error(`Export failed: ${error}`);
+		}
 	};
 
 	const handleMouseDown = (e: KonvaEventObject<MouseEvent>) => {
@@ -63,6 +65,7 @@ function App() {
 					className="border-grey-500 border-2 rounded-full p-2 bg-grey-200"
 					onClick={() => {
 						setLines([]);
+						setDigit(null);
 					}}
 				>
 					Erase
@@ -89,6 +92,7 @@ function App() {
 						<Rect width={300} height={300} fill="white" />
 						{lines.map((line, i) => (
 							<Line
+								// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
 								key={i}
 								points={line.points}
 								// stroke="#df4b26"
@@ -97,15 +101,13 @@ function App() {
 								tension={0.5}
 								lineCap="round"
 								lineJoin="round"
-								globalCompositeOperation={
-									// line.tool === "eraser" ? "destination-out" : "source-over"
-									"source-over"
-								}
+								globalCompositeOperation={"source-over"}
 							/>
 						))}
 					</Layer>
 				</Stage>
 			</div>
+			{digit && <p className="mt-2 text-4xl">Predicted digit: {digit}</p>}
 		</div>
 	);
 }

@@ -8,7 +8,11 @@ class CNNModel(nn.Module):
 
         # Convolution 1
         self.cnn1 = nn.Conv2d(
-            in_channels=1, out_channels=16, kernel_size=5, stride=1, padding=0
+            in_channels=1,
+            out_channels=16,
+            kernel_size=5,
+            stride=1,
+            padding=0,
         )
         self.relu1 = nn.ReLU()
 
@@ -17,7 +21,11 @@ class CNNModel(nn.Module):
 
         # Convolution 2
         self.cnn2 = nn.Conv2d(
-            in_channels=16, out_channels=32, kernel_size=5, stride=1, padding=0
+            in_channels=16,
+            out_channels=32,
+            kernel_size=5,
+            stride=1,
+            padding=0,
         )
         self.relu2 = nn.ReLU()
 

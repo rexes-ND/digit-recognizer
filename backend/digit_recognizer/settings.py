@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     # default
     "django.contrib.admin",
     "django.contrib.auth",
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     # third-party
     "corsheaders",
     "django_extensions",
+    "rest_framework",
     # local
     "api",
 ]
@@ -75,6 +77,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "digit_recognizer.wsgi.application"
+ASGI_APPLICATION = "digit_recognizer.asgi.application"
 
 
 # Database
