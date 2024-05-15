@@ -7,6 +7,15 @@ services:
       - "8000:8000"
     env_file:
       - .env
+  celery_worker:
+    build: ./backend
+    volumes:
+     - ./backend:/home/rexes/backend
+    env_file:
+     - .env
+    command: "watchfiles --filter python 'celery -A digit_recognizer worker -l INFO'"
+  redis:
+    image: redis
   frontend:
     build: ./frontend
     volumes:

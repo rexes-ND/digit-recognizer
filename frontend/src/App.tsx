@@ -10,6 +10,7 @@ type CustomLine = {
 function App() {
 	const [lines, setLines] = useState<Array<CustomLine>>([]);
 	const [digit, setDigit] = useState<number | null>(null);
+	// const [taskId, setTaskId] = useState<string | null>(null);
 	const isDrawing = useRef(false);
 	const stageRef = useRef<Konva.Stage>(null);
 
@@ -26,6 +27,7 @@ function App() {
 			});
 			const data = await res.json();
 			setDigit(data.digit);
+			// setTaskId(data.task_id);
 			setLines([]);
 		} catch (error) {
 			console.error(`Export failed: ${error}`);
@@ -65,6 +67,7 @@ function App() {
 					className="border-grey-500 border-2 rounded-full p-2 bg-grey-200"
 					onClick={() => {
 						setLines([]);
+						// setTaskId(null);
 						setDigit(null);
 					}}
 				>
@@ -108,6 +111,7 @@ function App() {
 				</Stage>
 			</div>
 			{digit && <p className="mt-2 text-4xl">Predicted digit: {digit}</p>}
+			{/* {taskId && <p className="mt-2 text-4xl">Task ID: {taskId}</p>} */}
 		</div>
 	);
 }

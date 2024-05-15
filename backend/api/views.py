@@ -1,36 +1,28 @@
-from io import BytesIO
+import base64
 
+from celery.result import AsyncResult
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import ParseError
-from PIL import Image
-import numpy as np
-import torch
 
-from .cnn import cnn_model
+from .tasks import classify
 
 
 class RecognizeAPIView(APIView):
     def post(self, request):
-        original_img = request.data.get("img")
-        if original_img is None:
+        print(f"Session: {request.session}")
+        session_id = request.session.get("id")
+
+        img = request.data.get("img")
+        if img is None:
             raise ParseError(
                 code="invalid_img",
                 detail="Invalid image",
             )
-        img = Image.open(BytesIO(original_img.read()))
-        img = img.resize((28, 28)).convert("L")
-        img = Image.fromarray(255 - np.array(img))
 
-        img_features = np.array(img, dtype=np.float32) / 255
-        img_features = torch.from_numpy(img_features)
-        img_features = img_features.unsqueeze(0).unsqueeze(0)
-
-        with torch.no_grad():
-            outputs = cnn_model(img_features)
-
-        # Get the predicted class
-        predicted_class = torch.argmax(outputs, dim=1).item()
+        img_str: str = base64.b64encode(img.read()).decode()
+        async_result: AsyncResult = classify.delay(img_str, session_id)
+        predicted_class = async_result.get()
 
         return Response(
             data={
