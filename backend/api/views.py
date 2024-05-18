@@ -22,10 +22,9 @@ class RecognizeAPIView(APIView):
 
         img_str: str = base64.b64encode(img.read()).decode()
         async_result: AsyncResult = classify.delay(img_str, session_id)
-        predicted_class = async_result.get()
 
         return Response(
             data={
-                "digit": predicted_class,
+                "task_id": async_result.id,
             }
         )

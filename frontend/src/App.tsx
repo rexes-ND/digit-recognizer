@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Stage, Layer, Line, Rect } from "react-konva";
 import type Konva from "konva";
 import type { KonvaEventObject } from "konva/lib/Node";
@@ -10,9 +10,38 @@ type CustomLine = {
 function App() {
 	const [lines, setLines] = useState<Array<CustomLine>>([]);
 	const [digit, setDigit] = useState<number | null>(null);
-	// const [taskId, setTaskId] = useState<string | null>(null);
+	const [taskId, setTaskId] = useState<string | null>(null);
+	const [taskState, setTaskState] = useState<string | null>(null);
 	const isDrawing = useRef(false);
 	const stageRef = useRef<Konva.Stage>(null);
+	const ws = useRef<WebSocket | null>(null);
+
+	useEffect(() => {
+		if (taskId === null) return;
+		ws.current = new WebSocket(
+			`ws://localhost:8000/ws/digit-recognize/${taskId}/`,
+		);
+		ws.current.onopen = () => {
+			console.log("WebSocket connection opened");
+		};
+
+		ws.current.onmessage = (e) => {
+			console.log(JSON.parse(e.data));
+			const data = JSON.parse(e.data);
+			setTaskState(data.code);
+			if (data.data !== null) {
+				setDigit(data.data);
+			}
+		};
+
+		ws.current.onclose = () => {
+			console.log("WebSocket connection closed");
+		};
+
+		return () => {
+			if (ws.current !== null) ws.current.close();
+		};
+	}, [taskId]);
 
 	const handleExport = async () => {
 		if (!stageRef.current) return;
@@ -26,8 +55,9 @@ function App() {
 				body: formData,
 			});
 			const data = await res.json();
-			setDigit(data.digit);
-			// setTaskId(data.task_id);
+			setDigit(null);
+			setTaskState(null);
+			setTaskId(data.task_id);
 			setLines([]);
 		} catch (error) {
 			console.error(`Export failed: ${error}`);
@@ -67,7 +97,8 @@ function App() {
 					className="border-grey-500 border-2 rounded-full p-2 bg-grey-200"
 					onClick={() => {
 						setLines([]);
-						// setTaskId(null);
+						setTaskId(null);
+						setTaskState(null);
 						setDigit(null);
 					}}
 				>
@@ -110,8 +141,13 @@ function App() {
 					</Layer>
 				</Stage>
 			</div>
+			{taskId && (
+				<p className="mt-2 text-4xl">
+					Task ID: {taskId}
+					{taskState && `, State: ${taskState}`}
+				</p>
+			)}
 			{digit && <p className="mt-2 text-4xl">Predicted digit: {digit}</p>}
-			{/* {taskId && <p className="mt-2 text-4xl">Task ID: {taskId}</p>} */}
 		</div>
 	);
 }
